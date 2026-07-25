@@ -1,4 +1,4 @@
-# 🚗 Sentinel: Autonomous Obstacle-Avoiding Robot
+# 🚗 Sentinel: Autonomous Obstacle-Avoiding Robot !! WORK IN PROGRESS !!
 
 ## 📌 Overview
 **Sentinel** is an embedded robotics project focused on building a mobile robotic platform capable of **autonomous navigation**. The system integrates low-level motor control with sensor-driven decision-making, allowing the robot to react dynamically to its environment in real time.
