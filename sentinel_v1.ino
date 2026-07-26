@@ -155,8 +155,9 @@ void setup() {
 }
 
 void loop(){
-  // CODE BELOW LETS ROBOT DRIVE FORWARD UNTIL IT IS LESS THAN 
-  // 40 CM AWAY FROM AN OBSTACLE
+  // This code lets robot drive forward until it is 40 cm or less from an obstacle in front of it.
+  // When it is 40 cm from an obstacle or less, the robot checks the furthest obstacle from its left and right.
+  // The robot then makes a decision to turn in whichever direction has the furthest obstacle. 
   digitalWrite(3, HIGH);
 
   float distance = getDistance();
