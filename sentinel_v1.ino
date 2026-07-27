@@ -1,6 +1,6 @@
 /***
 * Shyam Kishan
-* robotic_car.ino
+* sentinel_v1.ino
 * Implementation of basic controls for robotic car 7/25/26
 ***/
 
