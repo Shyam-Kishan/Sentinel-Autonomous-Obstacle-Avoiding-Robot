@@ -1,6 +1,6 @@
 import serial
 
-ser = serial.Serial('/dev/usb.serial-130', 9600)
+ser = serial.Serial('/dev/cu.usbserial-130', 9600)
 
 def move_robot(command):
     valid_commands = ["forward", "backward", "left", "right", "stop"]
