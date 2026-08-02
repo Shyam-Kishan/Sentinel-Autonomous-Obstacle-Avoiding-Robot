@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from mainRobot import Robot
 import atexit
 # from robot.controller import move_robot
@@ -6,6 +6,10 @@ import atexit
 
 app = Flask(__name__)
 robot = Robot()
+
+@app.route('/')
+def home():
+    return send_from_directory('.', 'index.html')
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "running"})

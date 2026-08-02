@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Robot Controller</title>
+</head>
+<body>
+  <h1>🤖 Robot Controller</h1>
+
+  <h2>Controls</h2>
+  <button onclick="sendCommand('forward')">Forward</button>
+  <button onclick="sendCommand('backward')">Backward</button>
+  <button onclick="sendCommand('left')">Left</button>
+  <button onclick="sendCommand('right')">Right</button>
+  <button onclick="sendCommand('stop')">Stop</button>
+
+  <h2>Mode</h2>
+  <button onclick="sendCommand('auto')">Auto</button>
+  <button onclick="sendCommand('manual')">Manual</button>
+
+  <h2>📏 Distance</h2>
+  <p id="distance">Loading...</p>
+
+  <script>
+    function sendCommand(cmd) {
+      fetch('http://127.0.0.1:5000/move', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ direction: cmd })
+      })
+      .then(res => res.json())
+      .then(data => console.log(data));
+    }
+
+    function updateDistance() {
+      fetch('http://127.0.0.1:5000/distance')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('distance').innerText =
+            data.distance !== null ? data.distance : "No data";
+        });
+    }
+
+    // refresh every 500ms
+    setInterval(updateDistance, 500);
+  </script>
+</body>
+</html>
