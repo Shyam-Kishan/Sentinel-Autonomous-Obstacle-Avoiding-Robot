@@ -1,7 +1,5 @@
 import serial
-
 ser = serial.Serial('/dev/cu.usbserial-130', 9600, timeout=1000)
-
 
 def get_distance():
     try: 

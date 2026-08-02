@@ -8,6 +8,5 @@ def move_robot(command):
     if command not in valid_commands:
         return "Invalid command"
 
-    # print(f"[DEBUG] Received command: {command}")
     ser.write(command.encode())
     return f"Sent {command} to robot"
