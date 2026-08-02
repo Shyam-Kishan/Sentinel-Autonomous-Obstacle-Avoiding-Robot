@@ -14,7 +14,8 @@ def get_distance():
 
     return None
 
-while True:
-    dist = get_distance()
-    if dist is not None:
-        print(f"Distance: {dist}")
+
+# while True:
+    #dist = get_distance()
+    # if dist is not None:
+        # print(f"Distance: {dist}")
