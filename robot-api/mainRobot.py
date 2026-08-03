@@ -34,7 +34,7 @@ class Robot:
         try:
             line = self.ser.readline().decode('utf-8', errors='ignore').strip()
             print("RAW:", repr(line))   # degbug
-            if not line.startswith("DIST:"):
+            if not line.startswith("<DIST:") and not line.endswith(">"):
                 return None
             return float(line.split(":")[1])
         
