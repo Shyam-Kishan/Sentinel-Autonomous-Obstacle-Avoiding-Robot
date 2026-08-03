@@ -5,8 +5,8 @@ import time
 class Robot:
     def __init__(self, port='/dev/cu.usbserial-130', baud=115200):
         self.ser = serial.Serial(port, baud, timeout=1)
+        self.ser.reset_input_buffer()
         time.sleep(2)  # allow Arduino to reset
-        # self.ser.reset_input_buffer()
         
         self.mode = "manual"
         self.last_distance = None
@@ -15,7 +15,7 @@ class Robot:
             "stop", "auto", "manual"
         ]
 
-    # 🔹 Send movement / mode commands
+    # Send movement / mode commands
     def send_command(self, command):
         if command not in self.valid_commands:
             return "Invalid command"
@@ -30,46 +30,35 @@ class Robot:
 
         return f"Sent {command}"
 
-    # 🔹 Read distance from Arduino
+    # Read distance from Arduino
     def get_distance(self):
         try:
-            while True:
-                if self.ser.in_waiting >= 6:
-                    continue
-                
-                # Look for Header
-                b1 = self.ser.read(1)
-                if b1 != b'\xAA':
-                    continue
-                
-                b2 = self.ser.read(1)
-                if b2 != b'\x55':
-                    continue
+            buffer = bytearray()
 
-                raw_bytes = self.ser.read(4)
-                if len(raw_bytes) < 4:
-                    continue
+            if self.ser.in_waiting:
+                buffer += self.ser.read(self.ser.in_waiting)
+            
+            # Keep buffer from growing forever
+            if len(buffer) > 100:
+                buffer = buffer[-50:]
 
-                unpacked_data = struct.unpack('<f', raw_bytes)[0]
-                print(f"Distance: {unpacked_data}")
-                # float_value = unpacked_data[0]
-                return round(unpacked_data, 2)
-        except Exception as e:
-                print("Sensor error:", e)
-        """
-        try:
-            line = self.ser.readline().decode('utf-8', errors='ignore').strip()
-            print("RAW:", repr(line))   # degbug
-            if not line.startswith("<DIST:") and not line.endswith(">"):
-                return None
-            print(float(line.split(":")[1]))
-            return float(line.split(":")[1])
-        
+            # Look for header inside buffer
+            for i in range(len(buffer) - 5):
+                if buffer[i] == 0xAA and buffer[i+1] == 0x55:
+                    packet = buffer[i+2:i+6]
+
+                    if len(packet) < 4:
+                        continue
+
+                    value = struct.unpack('<f', packet)[0]
+                    print("RAW BYTES:", list(packet))
+                    print("Distance:", value)
+
+                    buffer = buffer[i+6:]
+                    return round(value, 2)
+                
         except Exception as e:
             print("Sensor error:", e)
-
-        return None
-        """
 
     def get_telemetry(self):
         new_distance = self.get_distance()
@@ -84,11 +73,8 @@ class Robot:
         }
 
         return telemetry
-    # 🔹 Optional: stop robot (safety)
-    def stop(self):
-        self.ser.write(b"stop\n")
 
-    # 🔹 Cleanup on exit
+    # Cleanup on exit
     def close(self):
         self.stop()
         self.ser.close()
