@@ -44,7 +44,7 @@
     }
 
     function updateTelemetry() {
-      fetch('http://127.0.9.1:5000/telemetry')
+      fetch('http://127.0.0.1:5000/telemetry')
         .then(res => res.json())
         .then(data => {
           document.getElementById('telemetry').innerText = 
