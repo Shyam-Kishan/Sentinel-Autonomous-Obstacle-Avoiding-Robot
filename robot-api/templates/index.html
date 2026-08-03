@@ -48,7 +48,7 @@
         .then(res => res.json())
         .then(data => {
           document.getElementById('telemetry').innerText = 
-            data.telemetry !== null ? data.telemetry : "No data";
+            `Distance: ${data.distance ?? "N/A"}  |   Mode: ${data.mode ?? "N?A"}   |   Time: ${Math.floor(data.timestampe)}`;  
         });
     }
 
