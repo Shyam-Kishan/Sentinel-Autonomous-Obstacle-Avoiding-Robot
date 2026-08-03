@@ -6,7 +6,7 @@ class Robot:
     def __init__(self, port='/dev/cu.usbserial-130', baud=115200):
         self.ser = serial.Serial(port, baud, timeout=1)
         time.sleep(2)  # allow Arduino to reset
-        self.ser.reset_input_buffer()
+        # self.ser.reset_input_buffer()
         
         self.mode = "manual"
         self.last_distance = None
@@ -37,6 +37,7 @@ class Robot:
                 if self.ser.in_waiting >= 4:
                     raw_bytes = self.ser.read(4)
                     unpacked_data = struct.unpack('<f', raw_bytes)
+                    print(f"Unpacked Data: {unpacked_data}")
                     float_value = unpacked_data[0]
                     return round(float_value, 2)
         except Exception as e:
