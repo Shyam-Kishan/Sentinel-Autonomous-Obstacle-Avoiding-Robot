@@ -28,8 +28,8 @@ def distance():
 
 @app.route("/telemetry", methods=["GET"])
 def telemetry():
-    data = robot.get_telemtry()
-    return jsonify({"telemetry": data})
+    data = robot.get_telemetry()
+    return jsonify(data)
 
 @atexit.register
 def shutdown():
