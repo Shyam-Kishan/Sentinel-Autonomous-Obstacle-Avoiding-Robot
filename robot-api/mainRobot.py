@@ -4,7 +4,8 @@ import time
 class Robot:
     def __init__(self, port='/dev/cu.usbserial-130', baud=9600):
         self.ser = serial.Serial(port, baud, timeout=1)
-        time.sleep(2)  # allow Arduino to reset
+
+        self.mode = "manual"
 
         self.valid_commands = [
             "forward", "backward", "left", "right",
@@ -17,6 +18,13 @@ class Robot:
             return "Invalid command"
 
         self.ser.write((command + "\n").encode())
+
+        # Keep record of the mode
+        if command == "auto":
+            self.mode = "auto"
+        elif command == "manual":
+            self.mode = "manual"
+
         return f"Sent {command}"
 
     # 🔹 Read distance from Arduino
@@ -32,7 +40,15 @@ class Robot:
             print("Sensor error:", e)
 
         return None
+    
+    def get_telemetry(self):
+        telemetry = {
+            "distance": self.get_distance(),
+            "mode":self.mode,
+            "timestamp" : time.time()
+        }
 
+        return telemetry
     # 🔹 Optional: stop robot (safety)
     def stop(self):
         self.ser.write(b"stop\n")

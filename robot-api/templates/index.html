@@ -20,6 +20,9 @@
   <h2>📏 Distance</h2>
   <p id="distance">Loading...</p>
 
+  <h2>Telemetry</h2>
+  <p id="telemetry">>Loading...</p>
+
   <script>
     function sendCommand(cmd) {
       fetch('http://127.0.0.1:5000/move', {
@@ -40,8 +43,18 @@
         });
     }
 
+    function updateTelemetry() {
+      fetch('http://127.0.9.1:5000/telemetry')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('telemetry').innerText = 
+            data.telemetry !== null ? data.telemetry : "No data";
+        });
+    }
+
     // refresh every 500ms
     setInterval(updateDistance, 500);
+    setInterval(updateTelemetry, 500);
   </script>
 </body>
 </html>

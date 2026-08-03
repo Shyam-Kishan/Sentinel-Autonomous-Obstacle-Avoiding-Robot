@@ -1,15 +1,12 @@
 from flask import Flask, request, jsonify, render_template
 from mainRobot import Robot
 import atexit
-# from robot.controller import move_robot
-# from robot.sensor import get_distance
 
 app = Flask(__name__)
 robot = Robot()
 
 @app.route('/')
 def home():
-    # return send_from_directory('.', 'index.html')
     return render_template('index.html')
 
 @app.route("/health", methods=["GET"])
@@ -28,6 +25,11 @@ def move():
 def distance():
     dist = robot.get_distance()
     return jsonify({"distance": dist})
+
+@app.route("/telemetry", methods=["GET"])
+def telemetry():
+    data = robot.get_telemtry()
+    return jsonify({"telemetry": data})
 
 @atexit.register
 def shutdown():
