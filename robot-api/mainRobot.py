@@ -32,15 +32,12 @@ class Robot:
     # 🔹 Read distance from Arduino
     def get_distance(self):
         try:
-            while self.ser.in_waiting:
-                line = self.ser.readline().decode('utf-8', errors='ignore').strip()
-                print("RAW:", repr(line))   # degbug
-                if line.startswith("DIST:" and len(line) < 20):
-                    try:
-                        value = line.split("DIST:")[1].strip()
-                        return float(value)
-                    except ValueError:
-                        print("Bad Float:", line)
+            line = self.ser.readline().decode('utf-8', errors='ignore').strip()
+            print("RAW:", repr(line))   # degbug
+            if not line.startswith("DIST:"):
+                return None
+            return float(line.split(":")[1])
+        
         except Exception as e:
             print("Sensor error:", e)
 
