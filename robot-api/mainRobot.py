@@ -4,7 +4,8 @@ import time
 class Robot:
     def __init__(self, port='/dev/cu.usbserial-130', baud=9600):
         self.ser = serial.Serial(port, baud, timeout=1)
-
+        time.sleep(2)  # allow Arduino to reset
+        
         self.mode = "manual"
 
         self.valid_commands = [
