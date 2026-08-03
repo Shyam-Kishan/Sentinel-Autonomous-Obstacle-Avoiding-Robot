@@ -47,14 +47,15 @@
       fetch('http://127.0.0.1:5000/telemetry')
         .then(res => res.json())
         .then(data => {
+
           document.getElementById('telemetry').innerText = 
-            `Distance: ${data.distance ?? "N/A"}  |   Mode: ${data.mode ?? "N?A"}   |   Time: ${Math.floor(data.timestampe)}`;  
+            `Distance: ${data.distance ?? "N/A"}  |   Mode: ${data.mode ?? "N?A"}   |   Time: ${Math.floor(data.timestamp)}`;  
         });
     }
 
     // refresh every 500ms
     setInterval(updateDistance, 500);
-    setInterval(updateTelemetry, 500);
+    setInterval(updateTelemetry, 1000);
   </script>
 </body>
 </html>

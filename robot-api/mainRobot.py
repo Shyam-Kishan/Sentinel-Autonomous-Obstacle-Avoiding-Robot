@@ -7,7 +7,7 @@ class Robot:
         time.sleep(2)  # allow Arduino to reset
         
         self.mode = "manual"
-
+        self.last_distance = None
         self.valid_commands = [
             "forward", "backward", "left", "right",
             "stop", "auto", "manual"
@@ -31,22 +31,28 @@ class Robot:
     # 🔹 Read distance from Arduino
     def get_distance(self):
         try:
-            line = self.ser.readline().decode('utf-8').strip()
+            while self.ser.in_waiting:
+                line = self.ser.readline().decode('utf-8').strip()
 
-            if line.startswith("DIST:"):
-                value = line.split("DIST:")[1].strip()
-                return float(value)
+                if line.startswith("DIST:"):
+                    value = line.split("DIST:")[1].strip()
+                    return float(value)
 
         except Exception as e:
             print("Sensor error:", e)
 
         return None
-    
+
     def get_telemetry(self):
+        new_distance = self.get_distance()
+
+        if new_distance is not None:
+            self.last_distance = new_distance
+
         telemetry = {
-            "distance": self.get_distance(),
+            "distance":self.last_distance,
             "mode":self.mode,
-            "timestamp" : time.time()
+            "timestamp":time.time()
         }
 
         return telemetry
