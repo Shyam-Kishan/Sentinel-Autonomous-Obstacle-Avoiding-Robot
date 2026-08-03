@@ -34,7 +34,7 @@ class Robot:
     def get_distance(self):
         try:
             while True:
-                if self.ser.in_waiting <= 6:
+                if self.ser.in_waiting >= 6:
                     # Look for Header
                     b1 = self.ser.read(1)
                     if b1 != b'\xAA':
