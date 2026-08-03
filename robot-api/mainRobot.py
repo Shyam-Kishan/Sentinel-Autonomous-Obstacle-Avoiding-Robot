@@ -5,6 +5,7 @@ class Robot:
     def __init__(self, port='/dev/cu.usbserial-130', baud=9600):
         self.ser = serial.Serial(port, baud, timeout=1)
         time.sleep(2)  # allow Arduino to reset
+        self.ser.reset_input_buffer()
         
         self.mode = "manual"
         self.last_distance = None
@@ -32,12 +33,14 @@ class Robot:
     def get_distance(self):
         try:
             while self.ser.in_waiting:
-                line = self.ser.readline().decode('utf-8').strip()
-
-                if line.startswith("DIST:"):
-                    value = line.split("DIST:")[1].strip()
-                    return float(value)
-
+                line = self.ser.readline().decode('utf-8', errors='ignore').strip()
+                print("RAW:", repr(line))   # degbug
+                if line.startswith("DIST:" and len(line) < 20):
+                    try:
+                        value = line.split("DIST:")[1].strip()
+                        return float(value)
+                    except ValueError:
+                        print("Bad Float:", line)
         except Exception as e:
             print("Sensor error:", e)
 
