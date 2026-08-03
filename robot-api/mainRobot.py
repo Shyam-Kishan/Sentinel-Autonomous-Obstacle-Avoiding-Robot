@@ -35,23 +35,25 @@ class Robot:
         try:
             while True:
                 if self.ser.in_waiting >= 6:
-                    # Look for Header
-                    b1 = self.ser.read(1)
-                    if b1 != b'\xAA':
-                        continue
-                    
-                    b2 = self.ser.read(1)
-                    if b2 != b'\x55':
-                        continue
+                    continue
+                
+                # Look for Header
+                b1 = self.ser.read(1)
+                if b1 != b'\xAA':
+                    continue
+                
+                b2 = self.ser.read(1)
+                if b2 != b'\x55':
+                    continue
 
-                    raw_bytes = self.ser.read(4)
-                    if len(raw_bytes) < 4:
-                        continue
+                raw_bytes = self.ser.read(4)
+                if len(raw_bytes) < 4:
+                    continue
 
-                    unpacked_data = struct.unpack('<f', raw_bytes)[0]
-                    print(f"Distance: {unpacked_data}")
-                    # float_value = unpacked_data[0]
-                    return round(unpacked_data, 2)
+                unpacked_data = struct.unpack('<f', raw_bytes)[0]
+                print(f"Distance: {unpacked_data}")
+                # float_value = unpacked_data[0]
+                return round(unpacked_data, 2)
         except Exception as e:
                 print("Sensor error:", e)
         """
