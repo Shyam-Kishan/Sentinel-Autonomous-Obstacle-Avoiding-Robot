@@ -36,7 +36,7 @@ class Robot:
             print("RAW:", repr(line))   # degbug
             if not line.startswith("<DIST:") and not line.endswith(">"):
                 return None
-            print float(line.split(":")[1])
+            print(float(line.split(":")[1]))
             return float(line.split(":")[1])
         
         except Exception as e:
