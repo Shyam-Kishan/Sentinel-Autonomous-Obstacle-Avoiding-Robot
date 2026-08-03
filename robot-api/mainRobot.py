@@ -1,4 +1,5 @@
 import serial
+import struct
 import time
 
 class Robot:
@@ -32,6 +33,16 @@ class Robot:
     # 🔹 Read distance from Arduino
     def get_distance(self):
         try:
+            while True:
+                if self.ser.in_waiting >= 4:
+                    raw_bytes = self.ser.read(4)
+                    unpacked_data = struct.unpack('<f', raw_bytes)
+                    float_value = unpacked_data[0]
+                    return round(float_value, 2)
+        except Exception as e:
+                print("Sensor error:", e)
+        """
+        try:
             line = self.ser.readline().decode('utf-8', errors='ignore').strip()
             print("RAW:", repr(line))   # degbug
             if not line.startswith("<DIST:") and not line.endswith(">"):
@@ -43,6 +54,7 @@ class Robot:
             print("Sensor error:", e)
 
         return None
+        """
 
     def get_telemetry(self):
         new_distance = self.get_distance()
