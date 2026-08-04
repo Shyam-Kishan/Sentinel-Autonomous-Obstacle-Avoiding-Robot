@@ -133,6 +133,8 @@
 </div>
 
 <script>
+  const API_BASE = "http://127.0.0.1:5000";
+  
   const ctx = document.getElementById('distanceChart').getContext('2d');
 
   const data = {
@@ -165,7 +167,7 @@
 
   const distanceChart = new Chart(ctx, config)
   function sendCommand(cmd) {
-    fetch('http://127.0.0.1:5000/move', {
+    fetch(`${API_BASE}/move`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ command: cmd })
@@ -173,7 +175,7 @@
   }
 
   function updateTelemetry() {
-    fetch('http://127.0.0.1:5000/telemetry')
+    fetch(`${API_BASE}/telemetry`)
       .then(res => res.json())
       .then(data => {
 
