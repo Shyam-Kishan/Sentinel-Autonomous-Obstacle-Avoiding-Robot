@@ -2,105 +2,165 @@
 <html>
 <head>
   <title>Robot Dashboard</title>
+
   <style>
     body {
       background: #0f172a;
       color: white;
-      font-family: Arial;
-      text-align: center;
+      font-family: Arial, sans-serif;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
     }
 
     h1 {
-      margin-top: 20px;
+      text-align: center;
+      margin-bottom: 30px;
     }
 
     .card {
       background: #1e293b;
       padding: 20px;
-      margin: 20px auto;
-      width: 300px;
-      border-radius: 10px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    h2 {
+      margin-bottom: 15px;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 5px;
+    }
+
+    p {
+      font-size: 18px;
+      margin: 8px 0;
+    }
+
+    /* STATUS COLORS */
+    .online { color: #22c55e; font-weight: bold; }
+    .offline { color: #ef4444; font-weight: bold; }
+
+    /* BUTTONS */
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      justify-items: center;
     }
 
     button {
+      width: 100%;
       padding: 15px;
-      margin: 5px;
       font-size: 16px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
+      transition: 0.2s;
     }
+
+    button:hover {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+
     .forward { background: #22c55e; }
     .stop { background: #ef4444; }
-    .turn { background: #3b82f6;}
-    .mode { background: #FFA500}
+    .turn { background: #3b82f6; }
+    .mode { background: #f59e0b; }
+
+    .mode-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
   </style>
 </head>
 
 <body>
-  <h1>🤖 Robot Dashboard</h1>
 
+<div class="container">
+
+  <h1>🤖 Robot Control Dashboard</h1>
+
+  <!-- TELEMETRY -->
   <div class="card">
-    <h2>Telemetry</h2>
-    <p>Distance: <span id="distance">--</span> cm</p>
-    <p>Status: <span id="status">Loading...</span></p>
-    <p>Time: <span id="timestamp">Loading...</span></p>
+    <h2>📊 Telemetry</h2>
+    <p><strong>Distance:</strong> <span id="distance">--</span> cm</p>
+    <p><strong>Status:</strong> <span id="status" class="offline">Loading...</span></p>
+    <p><strong>Time:</strong> <span id="timestamp">--</span></p>
   </div>
 
+  <!-- CONTROLS -->
   <div class="card">
-    <h2>Controls</h2>
-    <button class="forward" onclick="sendCommand('forward')">Forward</button><br>
-    <button class="turn" onclick="sendCommand('left')">Left</button>
-    <button class="stop" onclick="sendCommand('stop')">Stop</button>
-    <button class="turn" onclick="sendCommand('right')">Right</button><br>
-    <button class="forward" onclick="sendCommand('backward')">Backward</button>
+    <h2>🎮 Controls</h2>
+    <div class="controls">
+      <div></div>
+      <button class="forward" onclick="sendCommand('forward')">↑</button>
+      <div></div>
+
+      <button class="turn" onclick="sendCommand('left')">←</button>
+      <button class="stop" onclick="sendCommand('stop')">■</button>
+      <button class="turn" onclick="sendCommand('right')">→</button>
+
+      <div></div>
+      <button class="forward" onclick="sendCommand('backward')">↓</button>
+      <div></div>
+    </div>
   </div>
 
-  <div class = "card">
-    <h2>Modes</h2>
-    <button class="mode" onclick="sendCommand('auto')">Auto</button>
-    <button class ="mode" onclick="sendCommand('manual')">Manual</button>
+  <!-- MODES -->
+  <div class="card">
+    <h2>⚙️ Modes</h2>
+    <div class="mode-buttons">
+      <button class="mode" onclick="sendCommand('auto')">Auto</button>
+      <button class="mode" onclick="sendCommand('manual')">Manual</button>
+    </div>
   </div>
 
-  <script>
-    function sendCommand(cmd) {
-      fetch('http://127.0.0.1:5000/move', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ command: cmd })
-      })
+</div>
+
+<script>
+  function sendCommand(cmd) {
+    fetch('http://127.0.0.1:5000/move', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ command: cmd })
+    });
+  }
+
+  function updateTelemetry() {
+    fetch('http://127.0.0.1:5000/telemetry')
       .then(res => res.json())
-      .then(data => console.log(data));
-    }
+      .then(data => {
 
-    function updateDistance() {
-      fetch('http://127.0.0.1:5000/distance')
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('distance').innerText =
-            data.distance !== null ? data.distance : "No data";
-        });
-    }
+        // FIXED BUG HERE (you had distnace typo)
+        document.getElementById('distance').innerText =
+          data.distance !== null ? data.distance : "No Data";
 
-    function updateTelemetry() {
-      fetch('http://127.0.0.1:5000/telemetry')
-        .then(res => res.json())
-        .then(data => {
+        const statusEl = document.getElementById('status');
+        statusEl.innerText = data.mode || "No Data";
 
-          document.getElementById('distance').innerText = 
-            data.distnace !== null ? data.distance : "No Data"
+        // status color
+        if (data.mode === "auto" || data.mode === "manual") {
+          statusEl.className = "online";
+        } else {
+          statusEl.className = "offline";
+        }
 
-          document.getElementById('status').innerText = 
-            data.mode !== null ? data.mode : "No Data"
+        // time formatting
+        const date = new Date(data.timestamp * 1000);
+        document.getElementById('timestamp').innerText =
+          date.toLocaleTimeString();
+      });
+  }
 
-          const date = new Date(data.timestamp * 1000);
-          document.getElementById('timestamp').innerText = 
-            date.toLocaleTimeString();
-        });
-    }
+  setInterval(updateTelemetry, 250);
+</script>
 
-    // refresh every 250ms
-    setInterval(updateTelemetry, 250);
-  </script>
 </body>
 </html>
