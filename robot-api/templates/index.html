@@ -93,8 +93,9 @@
           document.getElementById('status').innerText = 
             data.mode !== null ? data.mode : "No Data"
 
+          const date = new Date(data.timestamp * 1000);
           document.getElementById('timestamp').innerText = 
-            data.timestamp ? Math.floor(data.timestamp) : "No Data"
+            date.toLocaleTimeString();
         });
     }
 
