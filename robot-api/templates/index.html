@@ -1,27 +1,66 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Robot Controller</title>
+  <title>Robot Dashboard</title>
+  <style>
+    body {
+      background: #0f172a;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 20px;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 20px;
+      margin: 20px auto;
+      width: 300px;
+      border-radius: 10px;
+    }
+
+    button {
+      padding: 15px;
+      margin: 5px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .forward { background: #22c55e; }
+    .stop { background: #ef4444; }
+    .turn { background: #3b82f6;}
+    .mode { background: #FFA500}
+  </style>
 </head>
+
 <body>
-  <h1>🤖 Robot Controller</h1>
+  <h1>🤖 Robot Dashboard</h1>
 
-  <h2>Controls</h2>
-  <button onclick="sendCommand('forward')">Forward</button>
-  <button onclick="sendCommand('backward')">Backward</button>
-  <button onclick="sendCommand('left')">Left</button>
-  <button onclick="sendCommand('right')">Right</button>
-  <button onclick="sendCommand('stop')">Stop</button>
+  <div class="card">
+    <h2>Telemetry</h2>
+    <p>Distance: <span id="distance">--</span> cm</p>
+    <p>Status: <span id="status">Loading...</span></p>
+    <p>Time: <span id="timestamp">Loading...</span></p>
+  </div>
 
-  <h2>Mode</h2>
-  <button onclick="sendCommand('auto')">Auto</button>
-  <button onclick="sendCommand('manual')">Manual</button>
+  <div class="card">
+    <h2>Controls</h2>
+    <button class="forward" onclick="sendCommand('forward')">Forward</button><br>
+    <button class="turn" onclick="sendCommand('left')">Left</button>
+    <button class="stop" onclick="sendCommand('stop')">Stop</button>
+    <button class="turn" onclick="sendCommand('right')">Right</button><br>
+    <button class="forward" onclick="sendCommand('backward')">Backward</button>
+  </div>
 
-  <h2>📏 Distance</h2>
-  <p id="distance">Loading...</p>
-
-  <h2>Telemetry</h2>
-  <p id="telemetry">Loading...</p>
+  <div class = "card">
+    <h2>Modes</h2>
+    <button class="mode" onclick="sendCommand('auto')">Auto</button>
+    <button class ="mode" onclick="sendCommand('manual')">Manual</button>
+  </div>
 
   <script>
     function sendCommand(cmd) {
@@ -48,13 +87,18 @@
         .then(res => res.json())
         .then(data => {
 
-          document.getElementById('telemetry').innerText = 
-            `Distance: ${data.distance ?? "N/A"}\nMode: ${data.mode ?? "N/A"}\nTime: ${Math.floor(data.timestamp)}`;  
+          document.getElementById('distance').innerText = 
+            data.distnace !== null ? data.distance : "No Data"
+
+          document.getElementById('status').innerText = 
+            data.mode !== null ? data.mode : "No Data"
+
+          document.getElementById('timestamp').innerText = 
+            data.timestamp ? Math.floor(data.timestamp) : "No Data"
         });
     }
 
-    // refresh every 500ms
-    // setInterval(updateDistance, 500);
+    // refresh every 250ms
     setInterval(updateTelemetry, 250);
   </script>
 </body>
