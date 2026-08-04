@@ -79,6 +79,7 @@
     }
 
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -91,8 +92,9 @@
   <div class="card">
     <h2>📊 Telemetry</h2>
     <p><strong>Distance:</strong> <span id="distance">--</span> cm</p>
-    <p><strong>Status:</strong> <span id="status" class="offline">Loading...</span></p>
+    <p><strong>Status:</strong> <span id="status" class="offline">--</span></p>
     <p><strong>Time:</strong> <span id="timestamp">--</span></p>
+    <p><strong>Mode:</strong> <span id="mode">--</span></p>
   </div>
 
   <!-- CONTROLS -->
@@ -122,9 +124,46 @@
     </div>
   </div>
 
+  <!-- GRAPH -->
+  <div class="card">
+    <h3>Distance Over Time</h3>
+    <canvas id="distanceChart"></canvas>
+  </div>
+
 </div>
 
 <script>
+  const ctx = document.getElementById('distanceChart').getContext('2d');
+
+  const data = {
+    labels: [],   // timestamps
+    datasets: [{
+      label: 'Distance (cm)',
+      data: [],
+      borderColor: '#4fc3f7',
+      backgroundColor: 'rgba(79, 195, 247, 0.2)',
+      tension: 0.2
+    }]
+  };
+
+  const config = {
+    type: 'line',
+    data: data,
+    options: {
+      responsive: true,
+      animation: false,
+      scales: {
+        x: {
+          title: { display: true, text: 'Time'}
+        },
+        y: {
+          title: { display: true, text: 'Distance (cm)'}
+        }
+      }
+    }
+  };
+
+  const distanceChart = new Chart(ctx, config)
   function sendCommand(cmd) {
     fetch('http://127.0.0.1:5000/move', {
       method: 'POST',
@@ -141,24 +180,44 @@
         document.getElementById('distance').innerText =
           data.distance !== null ? data.distance : "No Data";
 
-        const statusEl = document.getElementById('status');
-        statusEl.innerText = data.mode || "No Data";
+        document.getElementById('status').innerText = data.status || "Connected";
+        document.getElementById('status').className = "online";
+
+        const mode = document.getElementById('mode');
+        mode.innerText = data.mode || "No Data";
 
         // status color
         if (data.mode === "auto" || data.mode === "manual") {
-          statusEl.className = "online";
+          mode.className = "online";
         } else {
-          statusEl.className = "offline";
+          mode.className = "offline";
         }
 
         // time formatting
         const date = new Date(data.timestamp * 1000);
         document.getElementById('timestamp').innerText =
           date.toLocaleTimeString();
+        
+        if (data.distance !== null && !isNaN(data.distance)) {
+          distanceChart.data.labels.push(date.toLocaleTimeString());
+          distanceChart.data.datasets[0].data.push(data.distance);
+        }
+
+        // Limit to last 20 points
+        if (distanceChart.data.labels.length > 20) {
+          distanceChart.data.labels.shift();
+          distanceChart.data.datasets[0].data.shift();
+        }
+
+        distanceChart.update();
+      })
+      .catch(() => {
+        const statusEl = document.getElementById('status');
+        statusEl.innerText = "Disconnected";
+        statusEl.className = "offline";
       });
   }
-
-  setInterval(updateTelemetry, 250);
+  setInterval(updateTelemetry, 500);
 </script>
 
 </body>
