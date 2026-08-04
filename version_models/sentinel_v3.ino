@@ -257,15 +257,15 @@ void loop(){
 
   if (auto_mode) {
     autoMode();
+    // makes the Servo move from 0º to 180º
+    if (check_time(lastServoMoveTime, 150)) {
+        angle += step;
+        if (angle >= 180 || angle <= 0) step = -step;
+        myServo.write(angle);
+    }
   } else {
     manualMode(cmd);
-  }
-  
-  // makes the Servo move from 0º to 180º
-  if (check_time(lastServoMoveTime, 150)) {
-    angle += step;
-    if (angle >= 180 || angle <= 0) step = -step;
-    myServo.write(angle);
+    myServo.write(90);
   }
 
   if (check_time(lastScanTime, 50)) {
