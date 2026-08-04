@@ -138,7 +138,6 @@
       .then(res => res.json())
       .then(data => {
 
-        // FIXED BUG HERE (you had distnace typo)
         document.getElementById('distance').innerText =
           data.distance !== null ? data.distance : "No Data";
 
