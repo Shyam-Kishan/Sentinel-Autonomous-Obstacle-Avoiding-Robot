@@ -73,6 +73,9 @@ class Robot:
         }
 
         return telemetry
+    
+    def stop(self):
+        self.ser.write(b"stop\n")
 
     # Cleanup on exit
     def close(self):
