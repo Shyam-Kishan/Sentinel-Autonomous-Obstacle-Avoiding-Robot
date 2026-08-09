@@ -1,352 +1,140 @@
-# 🤖 Robot Telemetry & Control API
+# Autonomous Obstacle-Avoiding Robot with Web Dashboard
 
-A full-stack embedded systems project that enables real-time monitoring and control of an Arduino-based mobile robot through a custom web dashboard.
+## Overview
 
-The system bridges embedded hardware and software by creating a communication pipeline between an Arduino robot controller, a Python backend API, and a browser-based user interface.
+This project is a **full-stack robotics system** that enables real-time control and monitoring of an autonomous obstacle-avoiding robot through a web-based dashboard.
 
-The robot supports both **manual control** and **autonomous obstacle avoidance**, while continuously streaming telemetry data such as distance measurements, operating mode, and timestamps.
-
----
-
-# 📌 Features
-
-## 🎮 Real-Time Robot Control
-
-Control robot movement through a browser interface:
-
-- Forward movement
-- Reverse movement
-- Left/right turning
-- Emergency stop
-- Manual/autonomous mode switching
-
-Commands are sent from the frontend to a Flask API, which communicates with the Arduino over serial communication.
+It integrates **hardware (Arduino + sensors)**, a **Python backend (Flask API)**, and a **frontend UI (HTML/CSS/JS + Chart.js)** to create a seamless interface for both **manual control** and **autonomous navigation**.
 
 ---
 
-## 📡 Live Robot Telemetry
+## Key Features
 
-The dashboard displays real-time robot information:
+* **Manual & Autonomous Modes**
 
-- Ultrasonic distance measurements
-- Current operating mode
-    - Manual
-    - Autonomous
-- Timestamped sensor updates
+  * Switch between user-controlled navigation and onboard obstacle avoidance logic
+* **Real-Time Telemetry**
 
-Telemetry data is continuously requested from the backend and displayed dynamically.
+  * Live distance readings streamed from ultrasonic sensors
+* **Dynamic Data Visualization**
 
----
+  * Distance-over-time graph using Chart.js
+* **Serial Communication Layer**
 
-## 🧠 Autonomous Obstacle Avoidance
+  * Python interface for reliable communication with Arduino firmware
+* **REST API**
 
-The robot includes an autonomous navigation mode using:
-
-- Ultrasonic distance sensing
-- Servo-based sensor scanning
-- Distance filtering
-- Exponential moving average (EMA) smoothing
-- Reactive decision making
-
-The robot evaluates surrounding distances and adjusts movement behavior to avoid obstacles.
+  * Control and monitor the robot via HTTP endpoints
 
 ---
 
-## 🖥️ Web-Based Dashboard
-
-A custom HTML/CSS/JavaScript interface provides:
-
-- Robot status monitoring
-- Live telemetry updates
-- Interactive control buttons
-- Mode selection
-- Human-readable timestamps
-
-The dashboard communicates with the Flask backend through REST endpoints.
-
----
-
-# 🏗️ System Architecture
+## System Architecture
 
 ```
-                  Browser Dashboard
-                (HTML/CSS/JavaScript)
-                         |
-                         |
-                    REST API
-                     Flask
-                         |
-                         |
-                Python Robot Controller
-                         |
-                         |
-                  Serial Communication
-                         |
-                         |
-                  Arduino Robot
-                         |
-        --------------------------------
-        |                              |
- Motor Control                  Sensor Processing
-        |                              |
- DC Motors                  Ultrasonic + Servo Sensor
+Frontend (Dashboard UI)
+        ↓
+Flask API (app.py)
+        ↓
+Robot Interface (mainRobot.py)
+        ↓
+Serial Communication (USB)
+        ↓
+Arduino Firmware (C++)
+        ↓
+Sensors + Motors
 ```
 
 ---
 
-# 🛠️ Technologies Used
+## Tech Stack
 
-## Embedded Systems
-- Arduino
-- C/C++
-- Servo motor control
-- Ultrasonic distance sensing
-- PWM motor control
-- Serial communication
+### Frontend
 
-## Backend
-- Python
-- Flask
-- REST API design
-- PySerial
+* HTML, CSS, JavaScript
+* Chart.js (real-time graphing)
 
-## Frontend
-- HTML
-- CSS
-- JavaScript
-- Fetch API
+### Backend
 
-## Development Tools
-- VS Code
-- Git/GitHub
-- Serial debugging
+* Python (Flask)
+* REST API design
+* Serial communication (pyserial)
+
+### Hardware
+
+* Arduino (C++)
+* Ultrasonic sensor
+* Motor driver + wheels
 
 ---
 
-# 🔌 API Endpoints
+## API Endpoints
 
-## Health Check
-
-### GET `/health`
-
-Checks whether the backend server is running.
-
-Example response:
-
-```json
-{
-    "status": "running"
-}
-```
+| Endpoint     | Method | Description                                      |
+| ------------ | ------ | ------------------------------------------------ |
+| `/health`    | GET    | Check server status                              |
+| `/move`      | POST   | Send movement commands (`forward`, `left`, etc.) |
+| `/distance`  | GET    | Retrieve current distance                        |
+| `/telemetry` | GET    | Get full robot state (distance, mode, timestamp) |
 
 ---
 
-## Robot Control
+## Dashboard Features
 
-### POST `/move`
+* Directional controls (forward, backward, left, right, stop)
+* Mode switching (auto/manual)
+* Live telemetry display:
 
-Sends commands to the robot.
-
-Example request:
-
-```json
-{
-    "command": "forward"
-}
-```
-
-Supported commands:
-
-```
-forward
-backward
-left
-right
-stop
-auto
-manual
-```
+  * Distance
+  * Mode
+  * Status
+  * Timestamp
+* Real-time distance graph
 
 ---
 
-## Distance Telemetry
+## How It Works
 
-### GET `/distance`
-
-Returns the latest ultrasonic sensor measurement.
-
-Example:
-
-```json
-{
-    "distance": 28.66
-}
-```
+1. User interacts with the **web dashboard**
+2. Commands are sent to the **Flask backend**
+3. Backend communicates with the robot via **serial (USB)**
+4. Arduino executes movement or autonomous logic
+5. Sensor data is sent back and visualized in real-time
 
 ---
 
-## Robot Telemetry
+## Notable Implementation Details
 
-### GET `/telemetry`
-
-Returns complete robot status information.
-
-Example:
-
-```json
-{
-    "distance": 28.66,
-    "mode": "manual",
-    "timestamp": 1785726182
-}
-```
+* **Custom binary packet parsing** for ultrasonic sensor data (`0xAA 0x55` header)
+* **State tracking** for robot mode (manual vs auto)
+* **Buffered serial reads** to ensure reliable data extraction
+* **Graceful shutdown handling** using `atexit` to safely stop the robot
 
 ---
 
-# 📂 Project Structure
+## Future Improvements
 
-```
-Robot-Telemetry-Control-API/
-│
-├── Arduino/
-│   └── sentinel_robot.ino
-│
-├── Backend/
-│   ├── app.py
-│   └── mainRobot.py
-│
-├── Frontend/
-│   └── index.html
-│
-└── README.md
-```
+* Add camera-based navigation (OpenCV)
+* Deploy dashboard remotely (cloud hosting)
+* Improve obstacle avoidance with SLAM/path planning
+* Add authentication for secure control
 
 ---
 
-# 🚀 How It Works
+## Demo
 
-1. The Arduino continuously reads ultrasonic sensor measurements.
-2. Sensor data is transmitted through serial communication.
-3. The Python backend receives sensor data and maintains robot state.
-4. Flask exposes REST API endpoints for:
-    - Sending movement commands
-    - Retrieving telemetry information
-5. The browser dashboard periodically requests updated telemetry data.
-6. User commands are sent back through the API and executed by the robot.
+> (Add GIF/video here of robot + dashboard in action)
 
 ---
 
-# 🧩 Key Engineering Concepts Learned
+## Conclusion
 
-## Embedded-to-Software Communication
+This project demonstrates the integration of **embedded systems, backend engineering, and frontend development** to build a complete, real-time robotic control platform.
 
-Learned how to bridge hardware and software systems using serial communication between an Arduino microcontroller and a Python application.
+It highlights skills in:
 
----
-
-## REST API Development
-
-Designed backend endpoints that allow external applications to interact with robot hardware through structured HTTP requests.
-
----
-
-## Real-Time Data Handling
-
-Implemented continuous telemetry updates by managing sensor streams, API polling, and frontend updates.
+* Systems design
+* API development
+* Hardware/software integration
+* Real-time data processing
 
 ---
-
-## Hardware Abstraction
-
-Created a Python robot controller layer that separates high-level commands from low-level hardware implementation.
-
----
-
-## Sensor Filtering
-
-Implemented techniques such as:
-
-- Data validation
-- Sensor averaging
-- Exponential moving average filtering
-
-to reduce noise from ultrasonic sensor readings.
-
----
-
-## State Management
-
-Designed a system that tracks robot operating states:
-
-- Manual mode
-- Autonomous mode
-
-and ensures commands are routed appropriately.
-
----
-
-# 🔮 Future Improvements
-
-## Wireless Robot Communication
-
-Replace the USB serial connection with wireless communication using:
-
-- ESP32 WiFi module
-- MQTT messaging
-- WebSocket communication
-
-allowing remote robot control over a network.
-
----
-
-## Cloud Deployment
-
-Deploy the backend API to a cloud service to allow robot monitoring from anywhere.
-
-Potential improvements:
-
-- Remote authentication
-- Cloud telemetry storage
-- User dashboards
-
----
-
-## Real-Time Streaming
-
-Replace HTTP polling with WebSockets for faster telemetry updates and lower latency.
-
----
-
-## Improved Autonomous Navigation
-
-Enhance obstacle avoidance with:
-
-- More advanced path planning
-- Sensor fusion
-- Mapping algorithms
-- Computer vision integration
-
----
-
-## Frontend Improvements
-
-Potential UI upgrades:
-
-- Live distance graphs
-- Battery monitoring
-- Robot camera integration
-- Mobile-friendly controls
-
----
-
-# 🎯 Project Goals
-
-This project demonstrates the integration of:
-
-- Embedded systems
-- Backend software engineering
-- API development
-- Hardware communication
-- Real-time data processing
-
-by creating a complete end-to-end robot control platform.
